@@ -12,6 +12,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.DefaultHandler;
+
 @SuppressWarnings("serial")
 public class AddressBook implements Serializable{
 
@@ -111,9 +117,72 @@ public class AddressBook implements Serializable{
 		return book;
 	}
 	
+	public String toXML()
+	{
+		String open = "<AddressBook>";
+		String close = "</AddressBook>";
+		String xml = open + "\n\t";
+		BuddyInfo b;
+		for(int i = 0; i<buddy.size(); i++)
+		{
+			b = buddy.get(i);
+			if(i == buddy.size()-1)
+			{
+				xml = xml + b.toXML() + "\n";
+			}
+			else
+			{
+				xml = xml + b.toXML() + "\n\t";
+			}
+		}
+		xml = xml + close;
+		return xml;
+	}
 	
+	public void ExportToXmlFile() throws IOException
+	{
+		File xmlFile = new File("/users/alshafiqhasbi/desktop/file.xml");
+		if (!xmlFile.exists()) {
+			xmlFile.createNewFile();
+		}
+		FileWriter fw = new FileWriter(xmlFile.getAbsoluteFile());
+		fw.write(this.toXML());
+		fw.close();
+	}
 	
-	public static void main(String[] args) throws IOException, ClassNotFoundException {
+	public void  importFromXmlFileDOM() throws Exception
+	{
+		AddressBook book = new AddressBook();
+		final BuddyInfo bud = null;
+		
+		File xmlFile = new File("/users/alshafiqhasbi/desktop/file.xml");
+		
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser s = spf.newSAXParser();
+		
+		DefaultHandler dh = new DefaultHandler()
+		{
+		
+			@Override
+			public void startElement(String uri, String localName, String qName, Attributes attributes)
+			{
+				System.out.println("Start: " + qName);
+			}
+			
+			public void endElement(String uri, String localName, String qName)
+			{
+				System.out.println("END: " + qName);
+			}
+			
+			public void characters(char[] ch, int start, int length)
+			{
+				System.out.println("CHARS: " + new String(ch, start, length));
+			}
+		};
+		s.parse(xmlFile, dh);
+	}
+	
+	public static void main(String[] args) throws Exception {
 		// Setup
 		BuddyInfo bud1 = new BuddyInfo("Apik", "Alta Vista", 613854);
 		BuddyInfo bud2 = new BuddyInfo("Ahmad", "Colonel By", 613855);
@@ -127,16 +196,20 @@ public class AddressBook implements Serializable{
 		book.addBuddy(bud3);
 		
 		// Runner
-		book.sExport();				//export AddressBook object
-		book2 = book.sImport();		//import AddressBook object
+		//book.sExport();				//export AddressBook object
+		//book2 = book.sImport();		//import AddressBook object
 		//book.export();			//export content of AddressBook
 		//book2 = book.importA();	//import content of AddressBook
-		System.out.println("See result in file.txt in the specified path(export).");
-		System.out.println("\nThis is book2(import from file) contents:");
+		book.ExportToXmlFile();
+		System.out.println(book.toXML());
+		System.out.println("\n");
+		book.importFromXmlFileDOM();
+		//System.out.println("See result in file.txt in the specified path(export).");
+		//System.out.println("\nThis is book2(import from file) contents:");
 		
 		for(int i = 0; i < book2.getBookSize(); i++)
 		{
-			System.out.println(book2.getBuddy(i).toString());
+			//System.out.println(book2.getBuddy(i).toString());
 		}
 	}
 

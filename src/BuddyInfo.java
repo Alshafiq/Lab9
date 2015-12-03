@@ -44,6 +44,17 @@ public class BuddyInfo implements Serializable {
 		return (getName() + "$" + getAddress() + "$" + getPhoneNum());
 	}
 	
+	public String toXML()
+	{
+		String openTag = "<BuddyInfo>" + "\n\t\t";
+		String nameTag = "<Name>" + this.getName() + "</Name>" + "\n\t\t";
+		String addressTag = "<Address>" + this.getAddress() + "</Address>" + "\n\t\t";
+		String phoneNumTag = "<PhoneNum>" + this.getPhoneNum() + "</PhoneNum>" + "\n\t";
+		String closeTag = "</BuddyInfo>";
+		String xml = openTag+nameTag+addressTag+phoneNumTag+closeTag;
+		return xml;
+	}
+	
 	public static BuddyInfo importB(String buddy)
 	{
 		@SuppressWarnings("resource")
